@@ -14,17 +14,37 @@ root.geometry("700x400+300+200")
 root.resizable(False, False)
 
 def getweather():
-    city = textfield.get()
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    location = geolocator.geocode(city)
-    obj = TimezoneFinder()
-    result = obj.timezone_at(lng=location.longitude, lat=location.latitude)
-    
-    home = pytz.timezone(result)
-    local_time = datetime.now(home)
-    current_time= local_time.strftime("%I:%M %P")
-    clock.config(text=current_time)
-    name.config(text="CURRENT WEATHER")
+    try:
+        city = textfield.get()
+        geolocator = Nominatim(user_agent="geoapiExercises")
+        location = geolocator.geocode(city)
+        obj = TimezoneFinder()
+        result = obj.timezone_at(lng=location.longitude, lat=location.latitude)
+        
+        home = pytz.timezone(result)
+        local_time = datetime.now(home)
+        current_time= local_time.strftime("%I:%M %P")
+        clock.config(text=current_time)
+        name.config(text="CURRENT WEATHER")
+        
+        api = "https://api.openweathermap.org/data/2.5/weather?"+city+"&appid=646824f2b7b86caffec1d0b16ea77f79"
+        json_data = requests.get(api).json()
+        condition = json_data['weather'][0]['main']
+        description = json_data['weather'][0]['description']
+        temp = int(json_data['main']['temp']-273.15)
+        pressure = json_data['main']['pressure']
+        humidity = json_data['main']['humidity']
+        wind = json_data['wind']['speed']
+        
+        t.config(text=(temp,"°"))
+        c.config(text=(condition,"|","FEELS","LIKE",temp,"°"))
+        
+        w.config(text=wind)
+        h.config(text=humidity)
+        d.config(text=description)
+        p.config(text=pressure)
+    except Exception as e:
+        messagebox.showerror("weather App","Invalid Entry!")
 
 img1 = Image.open("C:/Users/raraf/OneDrive/Desktop/programming/tkinter/Peraduxshort/search.png")
 img2 = Image.open("C:/Users/raraf/OneDrive/Desktop/programming/tkinter/Peraduxshort/bar.png")
